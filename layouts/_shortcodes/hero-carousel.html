@@ -1,17 +1,62 @@
+{{/*
+  ══════════ 首页合照轮播（hero-carousel） ══════════
+  ● 在哪儿被调用：content/_index.md 第一个 block 里的 {{< hero-carousel >}}
+  ● 换照片：把图放进 assets/media/slides/，命名 slide1.jpg…slide4.jpg
+  ● 加减张数：改下面「照片清单」那一行，同时按张数改动画时长
+  ═══════════════════════════════════════════════════════
+*/}}
+
 <style>
-.container[class*="max-w-[65ch]"] { max-width: 1180px !important; }
-.prose { width: 100% !important; max-width: 100% !important; }
-.hb-hero { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #111; }
-.hb-hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; opacity: 0; animation: hbFade 20s infinite; }
-@keyframes hbFade { 0% { opacity: 0 } 4% { opacity: 1 } 25% { opacity: 1 } 29% { opacity: 0 } 100% { opacity: 0 } }
-@media (prefers-reduced-motion: reduce) { .hb-hero img { animation: none } .hb-hero img:first-of-type { opacity: 1 } }
+  /* ── 外框：突破正文 65ch 的窄栏，铺开到接近整页宽度 ──
+     left:50% + translateX(-50%) 是这个“跳出窄栏并居中”的关键 */
+  .hb-hero {
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(1280px, 92vw);   /* ← 想更宽/更窄就改这里 */
+    aspect-ratio: 16 / 9;       /* ← 与照片同比例，才不会变形 */
+    overflow: hidden;
+    background: #000;
+  }
+
+  /* ── 每张照片 ──
+     cover = 填满且不裁；照片本身是 16:9、框也是 16:9，所以一点不裁 */
+  .hb-hero img {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;          /* ← 千万别改回 contain，那就是黑边的原因 */
+    opacity: 0;
+    animation: hbFade 20s infinite;   /* ← 20s 一轮（4 张 × 5s） */
+  }
+
+  /* ── 淡入淡出节奏：每张显示约 5 秒 ──
+     张数变了要重算：n 张时，把 25% 改成 100/n %，29% 顺延 +4% */
+  @keyframes hbFade {
+    0%   { opacity: 0 }
+    4%   { opacity: 1 }
+    25%  { opacity: 1 }
+    29%  { opacity: 0 }
+    100% { opacity: 0 }
+  }
+
+  /* 系统开了“减少动效”时只显示第一张 */
+  @media (prefers-reduced-motion: reduce) {
+    .hb-hero img { animation: none }
+    .hb-hero img:first-of-type { opacity: 1 }
+  }
 </style>
 
+{{/* 照片清单：按播放顺序写，加减张数改这一行 */}}
 {{ $slides := slice "media/slides/slide1.jpg" "media/slides/slide2.jpg" "media/slides/slide3.jpg" "media/slides/slide4.jpg" }}
+
 <div class="hb-hero">
   {{ range $i, $p := $slides }}
     {{ with resources.Get $p }}
-      <img src="{{ .RelPermalink }}" alt="南京大学蔡亮课题组合照" loading="{{ cond (eq $i 0) "eager" "lazy" }}" style="animation-delay: {{ mul $i 5 }}s;">
+      {{/* 第 i 张的登场时间 = i × 5 秒（动画时长 20s ÷ 4 张） */}}
+      <img src="{{ .RelPermalink }}"
+           alt="南京大学蔡亮课题组合照"
+           loading="{{ cond (eq $i 0) "eager" "lazy" }}"
+           style="animation-delay: {{ mul $i 5 }}s;">
     {{ end }}
   {{ end }}
 </div>
