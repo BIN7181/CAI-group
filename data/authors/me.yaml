@@ -7,7 +7,7 @@ name:
   family: 蔡
   alternate: Liang Cai
   pronunciation: ''
-  pronouns: he/him
+  pronouns: ''
 postnominals:
   - 博士
 status:
@@ -34,12 +34,12 @@ interests:
 education:
   - degree: 博士（硕博连读）
     institution: 中国科学技术大学
-    start: 2012-09-01
-    end: 2018-06-30
+    start: '2012'
+    end: '2018'
   - degree: 博士联合培养
     institution: 威斯康星大学麦迪逊分校
-    start: 2016-09-01
-    end: 2018-06-30
+    start: '2016'
+    end: '2018'
 experience:
   - role: 助理教授、博士生导师
     org: 南京大学能源与资源学院
