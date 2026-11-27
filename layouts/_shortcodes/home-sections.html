@@ -210,12 +210,13 @@
             {{ with $tag }}<span class="hb-chip">{{ . }}</span>{{ end }}
             <div class="hb-card-title">{{ .Title }}</div>
             <div class="hb-card-text">{{ with .Params.summary }}{{ . }}{{ else }}{{ .Summary | plainify | truncate 120 }}{{ end }}</div>
-            <div class="hb-card-meta">{{ with .Date }}{{ .Format "2006-01-02" }}{{ end }}{{ with .Params.authors }} · {{ delimit . "、" }}{{ end }}</div>
+            <div class="hb-card-meta">{{ with .Date }}{{ .Format "2006-01-02" }}{{ end }}</div>
             <div class="hb-card-more">Read more →</div>
           </div>
         </a>
       {{ end }}
     </div>
+    <div style="text-align:center; margin-top:26px;"><a class="hb-card-more" href="{{ relURL "blog/" }}">查看全部新闻 →</a></div>
   </div>
 
   {{/* ═══════════ 三、研究方向（自动取 projects 前 3 个） ═══════════ */}}
