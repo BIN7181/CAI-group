@@ -7,30 +7,38 @@
 */}}
 
 <style>
-  /* ── 外框：突破正文 65ch 的窄栏，铺开到接近整页宽度 ──
-     left:50% + translateX(-50%) 是这个“跳出窄栏并居中”的关键 */
+  /* ── 外框 ──
+     left:50% + translateX(-50%)：跳出正文 65ch 的窄栏、居中铺开
+     高度不再写死比例，而是由下面那张「隐形撑高图」决定，
+     所以外框高度永远等于第一张照片高度，不可能露出底色（黑边就是这么来的） */
   .hb-hero {
     position: relative;
     left: 50%;
     transform: translateX(-50%);
     width: min(1280px, 92vw);   /* ← 想更宽/更窄就改这里 */
-    aspect-ratio: 16 / 9;       /* ← 与照片同比例，才不会变形 */
     overflow: hidden;
-    background: #000;
+    background: transparent;    /* ← 不铺黑底，任何缝隙都只会露白底 */
+    line-height: 0;             /* ← 去掉图片基线的几像素空隙 */
   }
 
-  /* ── 每张照片 ──
-     cover = 填满且不裁；照片本身是 16:9、框也是 16:9，所以一点不裁 */
-  .hb-hero img {
+  /* ── 隐形撑高图：只用来量高度，看不见 ── */
+  .hb-hero .hb-spacer {
+    display: block;
+    width: 100%;
+    height: auto;
+    visibility: hidden;
+  }
+
+  /* ── 真正的轮播照片：全部叠在撑高图上淡入淡出 ── */
+  .hb-hero img:not(.hb-spacer) {
     position: absolute; inset: 0;
     width: 100%; height: 100%;
-    object-fit: cover;          /* ← 千万别改回 contain，那就是黑边的原因 */
+    object-fit: cover;          /* ← 别改回 contain，那就是黑边来源 */
     opacity: 0;
     animation: hbFade 20s infinite;   /* ← 20s 一轮（4 张 × 5s） */
   }
 
-  /* ── 淡入淡出节奏：每张显示约 5 秒 ──
-     张数变了要重算：n 张时，把 25% 改成 100/n %，29% 顺延 +4% */
+  /* ── 淡入淡出节奏：每张显示约 5 秒 ── */
   @keyframes hbFade {
     0%   { opacity: 0 }
     4%   { opacity: 1 }
@@ -39,7 +47,6 @@
     100% { opacity: 0 }
   }
 
-  /* 系统开了“减少动效”时只显示第一张 */
   @media (prefers-reduced-motion: reduce) {
     .hb-hero img { animation: none }
     .hb-hero img:first-of-type { opacity: 1 }
@@ -50,9 +57,13 @@
 {{ $slides := slice "media/slides/slide1.jpg" "media/slides/slide2.jpg" "media/slides/slide3.jpg" "media/slides/slide4.jpg" }}
 
 <div class="hb-hero">
+  {{/* 隐形撑高图：用第一张照片量出高度（它自己不显示） */}}
+  {{ with resources.Get (index $slides 0) }}
+    <img class="hb-spacer" src="{{ .RelPermalink }}" alt="" aria-hidden="true">
+  {{ end }}
   {{ range $i, $p := $slides }}
     {{ with resources.Get $p }}
-      {{/* 第 i 张的登场时间 = i × 5 秒（动画时长 20s ÷ 4 张） */}}
+      {{/* 第 i 张的登场时间 = i × 5 秒 */}}
       <img src="{{ .RelPermalink }}"
            alt="南京大学蔡亮课题组合照"
            loading="{{ cond (eq $i 0) "eager" "lazy" }}"
