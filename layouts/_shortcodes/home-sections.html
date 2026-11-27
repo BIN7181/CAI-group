@@ -1,0 +1,268 @@
+{{/*
+  ══════════════════════════════════════════════════════════════════════
+    首页「团队简介 / 新闻动态 / 研究方向 / 友情链接」四个板块
+    （一个短代码全包，方便你对着一处改；在 content/_index.md 里用 {{< home-sections >}} 调用）
+    ● 团队简介：文字直接改下面「一、团队简介」区块里的段落
+    ● 新闻动态：自动取 blog 里最新的 3 篇，不用手写
+    ● 研究方向：自动取 projects 里前 3 个，配图放在 assets/media/research/
+        dir1.jpg / dir2.jpg / dir3.jpg（第 1、2、3 个方向分别对应）
+    ● 友情链接：改最下面「四、友情链接」里的两行
+    ● 整体宽度：统一用 WIDTH（现在和首页合照轮播一样宽），想更宽更窄改一处就行
+  ══════════════════════════════════════════════════════════════════════
+*/}}
+
+<style>
+  /* ── 四个板块共用的外层：跳出正文 65ch 的窄栏，宽度对齐首页轮播照片 ── */
+  .hb-home {
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(1200px, 92vw);     /* ← 和首页轮播同宽 1200；想更宽/更窄四个板块一起改 */
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+  /* 板块之间的上下留白 */
+  .hb-home .hb-sec { margin: 56px 0; }
+  .hb-home .hb-home-title {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0 0 10px;
+  }
+  .hb-home .hb-home-sub {
+    text-align: center;
+    font-size: 15px;
+    color: #6b7280;
+    margin: 0 0 28px;
+  }
+
+  /* ── 一、团队简介：浅绿底面板（照南大官网那种淡淡的橄榄绿） ── */
+  .hb-home .hb-team {
+    background: #EDF0E4;          /* ← 底色，想更绿/更淡改这个色值 */
+    border: 1px solid #DFE5CF;    /* ← 外描边 */
+    border-radius: 4px;           /* ← 圆角 */
+    padding: 34px 44px 30px;      /* ← 内边距：上 右 下 左 */
+  }
+  .hb-home .hb-team h3 {
+    font-size: 30px;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0 0 6px;
+    letter-spacing: .06em;
+  }
+  .hb-home .hb-team .hb-team-sub {
+    font-size: 14px;
+    color: #5b6b52;
+    margin: 0 0 14px;
+  }
+  .hb-home .hb-team hr {
+    border: 0;
+    border-top: 1px solid #C9D2B6;   /* ← 标题下的细横线 */
+    margin: 0 0 22px;
+  }
+  .hb-home .hb-team p {
+    font-size: 16.5px;
+    line-height: 1.95;
+    color: #2c3440;
+    margin: 0 0 16px;
+    text-align: justify;            /* ← 两端对齐，看着更规整 */
+  }
+  .hb-home .hb-team p:last-child { margin-bottom: 0; }
+  .hb-home .hb-team .hb-journal { font-size: 15.5px; color: #46503f; }
+
+  /* ── 二、三：一行三列卡片（新闻动态 / 研究方向 共用） ── */
+  .hb-home .hb-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));  /* ← 三列等宽 */
+    gap: 24px;                                          /* ← 卡片间距 */
+  }
+  .hb-home .hb-card {
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 6px 22px rgba(15, 23, 42, .07);
+    border: 1px solid rgba(15, 23, 42, .06);
+    transition: transform .25s ease, box-shadow .25s ease;
+    text-decoration: none;
+  }
+  .hb-home .hb-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 14px 32px rgba(15, 23, 42, .13);
+  }
+  .hb-home .hb-card-thumb {
+    position: relative;
+    aspect-ratio: 16 / 9;            /* ← 图片统一 16:9，换图不用重新量 */
+    overflow: hidden;
+    background: linear-gradient(135deg, #E8EEF9 0%, #D9F2E6 100%);  /* 没有图时的占位渐变 */
+  }
+  .hb-home .hb-card-thumb img {
+    width: 100%; height: 100%;
+    object-fit: cover;               /* ← 图不够 16:9 时居中裁切，不会变形 */
+    display: block;
+  }
+  .hb-home .hb-card-body { padding: 20px 22px 22px; display: flex; flex-direction: column; flex: 1; }
+  .hb-home .hb-chip {
+    align-self: flex-start;
+    font-size: 12px;
+    color: #1d4ed8;
+    background: #EEF3FE;
+    border-radius: 999px;
+    padding: 2px 10px;
+    margin-bottom: 10px;
+    text-decoration: none;
+  }
+  .hb-home .hb-card-title {
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.5;
+    color: #1d3f8f;
+    margin: 0 0 8px;
+    text-decoration: none;
+  }
+  .hb-home .hb-card-title:hover { text-decoration: underline; }
+  .hb-home .hb-card-text {
+    font-size: 14px;
+    line-height: 1.75;
+    color: #4b5563;
+    margin: 0 0 14px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;          /* ← 摘要最多显示 3 行，多了自动截断 */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .hb-home .hb-card-meta {
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: auto;
+    padding-top: 4px;
+  }
+  .hb-home .hb-card-more {
+    font-size: 13px;
+    color: #2563eb;
+    margin-top: 10px;
+    text-decoration: none;
+  }
+
+  /* ── 四、友情链接：一行两个链接卡片 ── */
+  .hb-home .hb-links {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+  }
+  .hb-home .hb-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: #fff;
+    border: 1px solid rgba(15, 23, 42, .08);
+    border-radius: 14px;
+    padding: 20px 24px;
+    text-decoration: none;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, .05);
+    transition: transform .25s ease, box-shadow .25s ease;
+  }
+  .hb-home .hb-link:hover { transform: translateY(-3px); box-shadow: 0 12px 26px rgba(15,23,42,.12); }
+  .hb-home .hb-link-name { font-size: 16px; font-weight: 700; color: #1f2937; }
+  .hb-home .hb-link-url { font-size: 12.5px; color: #7b8794; margin-top: 4px; }
+  .hb-home .hb-link-arrow { font-size: 18px; color: #2563eb; }
+
+  /* 小屏（手机）自动降成单列，避免挤成一团 */
+  @media (max-width: 900px) {
+    .hb-home .hb-grid,
+    .hb-home .hb-links { grid-template-columns: 1fr; }
+    .hb-home .hb-team { padding: 24px 22px; }
+  }
+</style>
+
+<div class="hb-home">
+
+  {{/* ═══════════ 一、团队简介 ═══════════ */}}
+  <div class="hb-sec">
+    <div class="hb-team">
+      <h3>团队简介</h3>
+      <div class="hb-team-sub">南京大学能源与资源学院 · 电催化与电解水制氢实验室</div>
+      <hr>
+      <p>本课题组依托南京大学能源与资源学院，聚焦<strong>电解水制氢关键材料与器件</strong>，围绕阴离子交换膜（AEM）与质子交换膜（PEM）电解水体系，开展催化电极、膜电极组件与电解槽器件的设计、制备与性能调控研究。</p>
+      <p>课题组结合同步辐射<strong>工况（operando）与时间分辨 XAFS 谱学</strong>，原位追踪催化剂在反应条件下的结构演化与活性物种，揭示析氧／析氢反应机制；并探索电解水制氢与<strong>废塑料升级回收</strong>耦合的新路径，推动绿氢技术的低成本化与高值化。</p>
+      <p>在研究范式上，课题组坚持“材料—器件—表征”贯通：从催化剂的设计合成出发，经由膜电极、集流体与流道的工程化验证，再回到原位谱学厘清机理，形成设计—验证—反馈的闭环迭代，努力把实验室的催化性能推进到真实器件尺度。</p>
+      <p class="hb-journal">相关研究成果发表于 <em>JACS</em>、<em>ACS Energy Lett.</em>、<em>Nano Lett.</em>、<em>ACS Catal.</em> 等期刊。</p>
+    </div>
+  </div>
+
+  {{/* ═══════════ 二、新闻动态（自动取 blog 最新 3 篇） ═══════════ */}}
+  {{ $posts := first 3 (sort (where site.RegularPages "Section" "blog") "Date" "desc") }}
+  <div class="hb-sec">
+    <div class="hb-home-title">新闻动态</div>
+    <div class="hb-grid">
+      {{ range $posts }}
+        {{ $tag := "" }}{{ with .Params.categories }}{{ $tag = index . 0 }}{{ end }}
+        <a class="hb-card" href="{{ .RelPermalink }}">
+          <div class="hb-card-thumb">
+            {{ with .Params.image }}
+              {{ with resources.Get . }}<img src="{{ .RelPermalink }}" alt="{{ $.Title }}">{{ end }}
+            {{ end }}
+          </div>
+          <div class="hb-card-body">
+            {{ with $tag }}<span class="hb-chip">{{ . }}</span>{{ end }}
+            <div class="hb-card-title">{{ .Title }}</div>
+            <div class="hb-card-text">{{ with .Params.summary }}{{ . }}{{ else }}{{ .Summary | plainify | truncate 120 }}{{ end }}</div>
+            <div class="hb-card-meta">{{ with .Date }}{{ .Format "2006-01-02" }}{{ end }}{{ with .Params.authors }} · {{ delimit . "、" }}{{ end }}</div>
+            <div class="hb-card-more">Read more →</div>
+          </div>
+        </a>
+      {{ end }}
+    </div>
+  </div>
+
+  {{/* ═══════════ 三、研究方向（自动取 projects 前 3 个） ═══════════ */}}
+  {{ $projs := first 3 (where site.RegularPages "Section" "projects") }}
+  <div class="hb-sec">
+    <div class="hb-home-title">研究方向</div>
+    <div class="hb-home-sub">面向绿氢制备的材料、器件与原位表征</div>
+    <div class="hb-grid">
+      {{ range $i, $p := $projs }}
+        {{ $tag := "" }}{{ with $p.Params.tags }}{{ $tag = index . 0 }}{{ end }}
+        <a class="hb-card" href="{{ $p.RelPermalink }}">
+          <div class="hb-card-thumb">
+            {{/* 配图按顺序取 media/research/dir1~3.jpg，没有就留渐变占位 */}}
+            {{ $img := resources.Get (printf "media/research/dir%d.jpg" (add $i 1)) }}
+            {{ with $img }}<img src="{{ .RelPermalink }}" alt="{{ $p.Title }}">{{ end }}
+          </div>
+          <div class="hb-card-body">
+            {{ with $tag }}<span class="hb-chip">{{ . }}</span>{{ end }}
+            <div class="hb-card-title">{{ $p.Title }}</div>
+            <div class="hb-card-text">{{ with $p.Params.summary }}{{ . }}{{ else }}{{ $p.Summary | plainify | truncate 120 }}{{ end }}</div>
+            <div class="hb-card-meta">{{ with $p.Date }}{{ .Format "2006-01-02" }}{{ end }}</div>
+            <div class="hb-card-more">Read more →</div>
+          </div>
+        </a>
+      {{ end }}
+    </div>
+  </div>
+
+  {{/* ═══════════ 四、友情链接 ═══════════ */}}
+  <div class="hb-sec">
+    <div class="hb-home-title">友情链接</div>
+    <div class="hb-links">
+      <a class="hb-link" href="https://www.nju.edu.cn/" target="_blank" rel="noopener">
+        <div>
+          <div class="hb-link-name">南京大学</div>
+          <div class="hb-link-url">www.nju.edu.cn</div>
+        </div>
+        <div class="hb-link-arrow">↗</div>
+      </a>
+      <a class="hb-link" href="https://sser.nju.edu.cn/index.htm" target="_blank" rel="noopener">
+        <div>
+          <div class="hb-link-name">南京大学能源与资源学院</div>
+          <div class="hb-link-url">sser.nju.edu.cn</div>
+        </div>
+        <div class="hb-link-arrow">↗</div>
+      </a>
+    </div>
+  </div>
+
+</div>
