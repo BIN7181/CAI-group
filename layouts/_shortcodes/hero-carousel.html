@@ -1,0 +1,16 @@
+<style>
+.prose { max-width: 100% !important; }
+.hb-hero{position:relative;width:100%;aspect-ratio:16/9;max-height:60vh;overflow:hidden;border-radius:16px;background:#0c0c0c;box-shadow:0 10px 30px rgba(0,0,0,.12);}
+.hb-hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;animation:hbFade 20s infinite;}
+@keyframes hbFade{0%{opacity:0}4%{opacity:1}25%{opacity:1}29%{opacity:0}100%{opacity:0}}
+@media (max-width:768px){.hb-hero{aspect-ratio:4/3;border-radius:10px;}}
+@media (prefers-reduced-motion:reduce){.hb-hero img{animation:none}.hb-hero img:first-of-type{opacity:1}}
+</style>
+{{ $slides := slice "media/slides/slide1.jpg" "media/slides/slide2.jpg" "media/slides/slide3.jpg" "media/slides/slide4.jpg" }}
+<div class="hb-hero">
+{{ range $i, $p := $slides }}
+{{ with resources.Get $p }}
+<img src="{{ .RelPermalink }}" alt="Group photo" loading="{{ cond (eq $i 0) "eager" "lazy" }}" style="animation-delay: {{ mul $i 5 }}s;">
+{{ end }}
+{{ end }}
+</div>
