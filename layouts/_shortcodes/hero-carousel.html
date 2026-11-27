@@ -1,7 +1,8 @@
 <style>
-.prose, .max-w-prose { width: 100% !important; max-width: 100% !important; }
-.hb-hero { position: relative; width: 100vw; left: 50%; margin-left: -50vw; height: 58vh; min-height: 320px; overflow: hidden; background: #111; }
-.hb-hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; animation: hbFade 20s infinite; }
+.container[class*="max-w-[65ch]"] { max-width: 1180px !important; }
+.prose { width: 100% !important; max-width: 100% !important; }
+.hb-hero { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: #111; }
+.hb-hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; opacity: 0; animation: hbFade 20s infinite; }
 @keyframes hbFade { 0% { opacity: 0 } 4% { opacity: 1 } 25% { opacity: 1 } 29% { opacity: 0 } 100% { opacity: 0 } }
 @media (prefers-reduced-motion: reduce) { .hb-hero img { animation: none } .hb-hero img:first-of-type { opacity: 1 } }
 </style>
