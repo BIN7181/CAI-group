@@ -1,0 +1,13 @@
+{{- $images := slice "slide1" "slide2" "slide3" "slide4" -}}
+{{- $ext := "jpg" -}}
+<div class="hb-carousel">
+  {{- range $i, $name := $images }}
+  <img src="{{ printf "/media/slides/%s.%s" $name $ext }}" alt="课题组照片 {{ add $i 1 }}" loading="{{ cond (eq $i 0) "eager" "lazy" }}" style="animation-delay: {{ mul $i 5 }}s" />
+  {{- end }}
+</div>
+<style>
+.hb-carousel{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;border-radius:0.5rem;background:#0b0b0b;}
+.hb-carousel img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;opacity:0;margin:0;animation:hb-carousel-fade 20s infinite;}
+@keyframes hb-carousel-fade{0%{opacity:0}4%{opacity:1}25%{opacity:1}29%{opacity:0}100%{opacity:0}}
+@media (prefers-reduced-motion: reduce){.hb-carousel img{animation:none;}.hb-carousel img:first-child{opacity:1;}}
+</style>
