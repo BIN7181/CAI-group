@@ -1,56 +1,49 @@
 {{/*
   ══════════ 首页合照轮播（hero-carousel） ══════════
-  ● 在哪儿被调用：content/_index.md 第一个 block 里的 {{< hero-carousel >}}
-  ● 换照片：把图放进 assets/media/slides/，文件名随便定，但下面「照片清单」必须写成
-     与仓库里一模一样（⚠ 大小写要完全一致：Slide1.jpg 和 slide1.jpg 是两个不同文件）
-  ● 加减张数：只改下面「照片清单」那一行，圆点数量会自动跟着变
-  ● 播放间隔：改 JS 里的 DUR（单位毫秒，现在 5000 = 5 秒）
-  ● 排错：如果首页只剩几个圆点、照片没了，就是清单里的文件名和仓库里的对不上
-     （最常见原因是首字母大写 vs 小写），去 assets/media/slides/ 核对一遍文件名即可
+  ● 显示尺寸：固定 1200 × 675（= 16:9），由下面的 .hb-hero 控制
+      width: min(1200px, 92vw)  → 宽最多 1200（窗口太窄时按 92vw 缩）
+      aspect-ratio: 16 / 9      → 高自动 = 宽 × 9/16，所以永远 16:9，不会有黑边
+  ● 换照片：把图放进 assets/media/slides/，文件名要跟下面「照片清单」一字不差
+      ⚠ 大小写敏感：Slide1.jpg 与 slide1.jpg 是两个不同文件
+      ⚠ 照片本身最好也导出成 1200×675，否则 object-fit: cover 会按 16:9 居中裁掉一点边
+  ● 加减张数：只改「照片清单」那一行，圆点数量自动跟着变
+  ● 播放间隔：改 JS 里的 DUR（毫秒，5000 = 5 秒）
+  ● 排错：首页只剩几个圆点、照片没了 → 清单里的文件名和仓库里对不上（最常见是大小写）
   ═══════════════════════════════════════════════════════
 */}}
 
 <style>
-  /* ── 外框 ──
-     left:50% + translateX(-50%)：跳出正文 65ch 的窄栏、居中铺开
-     高度由「隐形撑高图」决定 = 第一张照片的原生高度，所以永远不会有黑边 */
+  /* ── 外框：跳出正文 65ch 窄栏，居中铺开，比例锁死 16:9 ── */
   .hb-hero {
     position: relative;
     left: 50%;
     transform: translateX(-50%);
-    width: min(1280px, 92vw);   /* ← 想更宽/更窄就改这里 */
+    width: min(1200px, 92vw);   /* ← 想更宽/更窄改这里（高度会按 16:9 自动算） */
+    aspect-ratio: 16 / 9;       /* ← 严格 1200×675 比例，别删这行 */
     overflow: hidden;
     background: transparent;
     line-height: 0;
   }
 
-  /* ── 隐形撑高图：只用来量高度，看不见 ── */
-  .hb-hero .hb-spacer {
-    display: block;
-    width: 100%;
-    height: auto;
-    visibility: hidden;
-  }
-
-  /* ── 每张照片：叠在撑高图上，靠 .is-active 控制显示 ── */
+  /* ── 每张照片：铺满整个框，靠 .is-active 控制显示 ── */
   .hb-hero .hb-slide {
     position: absolute; inset: 0;
     width: 100%; height: 100%;
-    object-fit: cover;        /* ← 别改回 contain，那就是黑边来源 */
+    object-fit: cover;          /* ← 图不是 16:9 时居中裁切填满，别改成 contain（那就是黑边） */
     opacity: 0;
     transition: opacity .8s ease;   /* ← 淡入淡出时长 */
     z-index: 1;
   }
   .hb-hero .hb-slide.is-active { opacity: 1; }
 
-  /* ── 底部圆点按钮（照参考站点样式：半透明白点，当前那张为实心白点） ── */
+  /* ── 底部圆点按钮：半透明白点，当前那张为实心白点 ── */
   .hb-hero .hb-dots {
     position: absolute;
     left: 50%;
-    bottom: 18px;             /* ← 圆点离底边的距离 */
+    bottom: 18px;               /* ← 圆点离底边距离 */
     transform: translateX(-50%);
     display: flex;
-    gap: 10px;                /* ← 圆点间距 */
+    gap: 10px;                  /* ← 圆点间距 */
     z-index: 10;
     line-height: 0;
   }
@@ -73,16 +66,11 @@
 
 {{/* 照片清单：按播放顺序写，加减张数只改这一行
      ⚠ 必须和仓库 assets/media/slides/ 里的实际文件名完全一致（含大小写）
-     现在的实际文件名是 Slide1.jpg ~ Slide4.jpg（首字母大写 S） */}}
+     现在的实际文件名是 Slide1.jpg ~ Slide4.jpg（首字母大写） */}}
 {{ $slides := slice "media/slides/Slide1.jpg" "media/slides/Slide2.jpg" "media/slides/Slide3.jpg" "media/slides/Slide4.jpg" }}
 
 <div class="hb-hero">
-  {{/* 隐形撑高图：用第一张照片量出高度（它自己不显示） */}}
-  {{ with resources.Get (index $slides 0) }}
-    <img class="hb-spacer" src="{{ .RelPermalink }}" alt="" aria-hidden="true">
-  {{ end }}
-
-  {{/* 照片本体 */}}
+  {{/* 照片本体：绝对定位叠在一起，只有 is-active 那张可见 */}}
   {{ range $i, $p := $slides }}
     {{ with resources.Get $p }}
       <img class="hb-slide{{ if eq $i 0 }} is-active{{ end }}"
