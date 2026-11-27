@@ -1,5 +1,5 @@
 ---
-title: 'Projects'
+title: "研究方向"
 date: 2024-05-19
 type: landing
 

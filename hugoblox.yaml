@@ -1,8 +1,27 @@
-build:
-  hugo_version: '0.162.0'
-deploy:
-  # Deployment target: github-pages, netlify, vercel, cloudflare, or none
-  host: 'github-pages'
-template:
-  id: "academic-cv"
-  name: "Academic CV"
+title: 蔡亮课题组
+baseURL: https://BIN7181.github.io/cai-group/
+languageCode: zh-cn
+
+menu:
+  main:
+    - name: 首页
+      url: /
+      weight: 1
+    - name: 研究方向
+      url: /research/
+      weight: 2
+    - name: 团队成员
+      url: /people/
+      weight: 3
+    - name: 学术成果
+      url: /publication/
+      weight: 4
+    - name: 课题组新闻
+      url: /news/
+      weight: 5
+    - name: 招生信息
+      url: /join/
+      weight: 6
+    - name: 联系我们
+      url: /contact/
+      weight: 7
