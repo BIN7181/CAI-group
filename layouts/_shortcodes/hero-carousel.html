@@ -1,9 +1,12 @@
 {{/*
   ══════════ 首页合照轮播（hero-carousel） ══════════
   ● 在哪儿被调用：content/_index.md 第一个 block 里的 {{< hero-carousel >}}
-  ● 换照片：把图放进 assets/media/slides/，命名 slide1.jpg…slide4.jpg
+  ● 换照片：把图放进 assets/media/slides/，文件名随便定，但下面「照片清单」必须写成
+     与仓库里一模一样（⚠ 大小写要完全一致：Slide1.jpg 和 slide1.jpg 是两个不同文件）
   ● 加减张数：只改下面「照片清单」那一行，圆点数量会自动跟着变
   ● 播放间隔：改 JS 里的 DUR（单位毫秒，现在 5000 = 5 秒）
+  ● 排错：如果首页只剩几个圆点、照片没了，就是清单里的文件名和仓库里的对不上
+     （最常见原因是首字母大写 vs 小写），去 assets/media/slides/ 核对一遍文件名即可
   ═══════════════════════════════════════════════════════
 */}}
 
@@ -40,14 +43,14 @@
   }
   .hb-hero .hb-slide.is-active { opacity: 1; }
 
-  /* ── 底部圆点按钮（半透明白点，当前那张为实心白点） ── */
+  /* ── 底部圆点按钮（照参考站点样式：半透明白点，当前那张为实心白点） ── */
   .hb-hero .hb-dots {
     position: absolute;
     left: 50%;
     bottom: 18px;             /* ← 圆点离底边的距离 */
     transform: translateX(-50%);
     display: flex;
-    gap: 10px;                /* ← 圆点之间的间距 */
+    gap: 10px;                /* ← 圆点间距 */
     z-index: 10;
     line-height: 0;
   }
@@ -68,8 +71,10 @@
   }
 </style>
 
-{{/* 照片清单：按播放顺序写，加减张数改这一行 */}}
-{{ $slides := slice "media/slides/slide1.jpg" "media/slides/slide2.jpg" "media/slides/slide3.jpg" "media/slides/slide4.jpg" }}
+{{/* 照片清单：按播放顺序写，加减张数只改这一行
+     ⚠ 必须和仓库 assets/media/slides/ 里的实际文件名完全一致（含大小写）
+     现在的实际文件名是 Slide1.jpg ~ Slide4.jpg（首字母大写 S） */}}
+{{ $slides := slice "media/slides/Slide1.jpg" "media/slides/Slide2.jpg" "media/slides/Slide3.jpg" "media/slides/Slide4.jpg" }}
 
 <div class="hb-hero">
   {{/* 隐形撑高图：用第一张照片量出高度（它自己不显示） */}}
@@ -120,7 +125,7 @@
     dots.forEach(function (d) {
       d.addEventListener('click', function () {
         show(parseInt(d.dataset.index, 10));
-        play();               /* 手动点完，接着自动轮播 */
+        play();               /* 手动点完接着自动轮播 */
       });
     });
 
