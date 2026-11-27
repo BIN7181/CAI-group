@@ -228,8 +228,8 @@
         {{ $tag := "" }}{{ with $p.Params.tags }}{{ $tag = index . 0 }}{{ end }}
         <a class="hb-card" href="{{ $p.RelPermalink }}">
           <div class="hb-card-thumb">
-            {{/* 配图按顺序取 media/research/dir1~3.jpg，没有就留渐变占位 */}}
-            {{ $img := resources.Get (printf "media/research/dir%d.jpg" (add $i 1)) }}
+            {{/* 配图按顺序取 assets/media/dir1~3.jpg，没有就留渐变占位 */}}
+            {{ $img := resources.Get (printf "media/dir%d.jpg" (add $i 1)) }}
             {{ with $img }}<img src="{{ .RelPermalink }}" alt="{{ $p.Title }}">{{ end }}
           </div>
           <div class="hb-card-body">
